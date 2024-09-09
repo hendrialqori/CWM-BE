@@ -1,0 +1,1 @@
+select trx.email, trx.phone, p.originalPrice from transactions as trx join product as p on (trx.productId=p.id)
