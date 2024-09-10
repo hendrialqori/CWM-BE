@@ -41,7 +41,6 @@ export default class AuthService {
             httpOnly: true,
             secure: true,
         })
-
     }
 
     static async register(request: InsertUser) {

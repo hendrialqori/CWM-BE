@@ -16,8 +16,9 @@ export default class ProductController {
     }
 
     static async get(req: Request, res: Response, next: NextFunction) {
-        const params = req.params as unknown as { id: number }
         try {
+            const params = req.params as unknown as { id: number }
+            
             const data = await ProductService.get(params.id)
             return res.status(200)
                 .json({ data, message: "Successfully" })
@@ -38,19 +39,24 @@ export default class ProductController {
 
     static async update(req: Request, res: Response, next: NextFunction) {
         try {
+            const params = req.params as unknown as { id: number }
 
+            await ProductService.update(params.id, req)
+            return res.status(200)
+                .json({ data: null, message: `Successfully update product with id ${params.id}` })
         } catch (error) {
             next(error)
         }
     }
 
     static async remove(req: Request, res: Response, next: NextFunction) {
-        const params = req.params as unknown as { id: number }
         try {
+            const params = req.params as unknown as { id: number }
+
             await ProductService.remove(params.id)
             return res.status(200)
                 .json({ data: null, message: `Successfully remove product with id ${params.id}` })
-                
+
         } catch (error) {
             next(error)
         }

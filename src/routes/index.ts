@@ -17,7 +17,8 @@ apiRouter.delete("/api/user/:id/remove", isAuthenticate, UsersController.remove)
 
 apiRouter.get("/api/product/list", isAuthenticate, ProductController.list)
 apiRouter.get("/api/product/:id", isAuthenticate, ProductController.get)
-apiRouter.post("/api/product/add", fileUpload.single("image") ,ProductController.add)
+apiRouter.post("/api/product/add", [isAuthenticate, fileUpload.single("image")], ProductController.add)
+apiRouter.put("/api/product/:id/update", [isAuthenticate, fileUpload.single("image")], ProductController.update)
 apiRouter.delete("/api/product/:id/remove", isAuthenticate, ProductController.remove)
 
 

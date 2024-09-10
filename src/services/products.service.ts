@@ -43,6 +43,7 @@ export default class ProductService {
         const body = request.body as InsertProduct
         const image = request.file!
 
+        //validation
         const productRequest = Validation.validate(ProductsValidation.ADD, body)
 
         // validate image
@@ -67,7 +68,43 @@ export default class ProductService {
 
     }
 
-    static async update() { }
+    static async update(id: number, request: Request) {
+        const body = request.body as InsertProduct
+        const image = request.file!
+
+        const isImageExist = radash.isObject(image)
+
+        // validation
+        const productRequest = Validation.validate(ProductsValidation.ADD, body)
+        // previous product
+        const prevProduct = await ProductService.get(id)
+
+        let imageName: string, imagePath: string, imageBuffer: Buffer
+
+        // if user upload new image
+        if (isImageExist) {
+            imageName = Date.now() + "-" + image.originalname
+            imageBuffer = image.buffer
+            imagePath = path.join(__dirname, "..", "..", "public", "static", imageName);
+
+            // add new image
+            await writeFile(imagePath, imageBuffer)
+
+            // remove previous image
+            const prevImagePath = path.join(__dirname, "..", "..", "public", "static", prevProduct.image!)
+            await unlink(prevImagePath)
+        } 
+
+        const updateProduct = {
+            ...productRequest,
+            ...(isImageExist ? { image: imageName } : { image: prevProduct.image })
+        }
+
+        await db.update(productsTable)
+            .set(updateProduct)
+            .where(eq(productsTable.id, id))
+
+    }
 
     static async remove(id: number) {
         // check are there product ?
@@ -75,7 +112,7 @@ export default class ProductService {
 
         // if exist, remove it from db
         await db.delete(productsTable)
-        .where(eq(productsTable.id, id))
+            .where(eq(productsTable.id, id))
 
         // remove image from static dir
         const imagePath = path.join(__dirname, "..", "..", "public", "static", product.image!)

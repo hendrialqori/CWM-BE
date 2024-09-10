@@ -4,13 +4,11 @@ import cors from "cors"
 import compression from "compression"
 import cookieParser from "cookie-parser"
 import helmet from "helmet"
-import multer from "multer"
+
 import { logger } from "./utils/helpers";
 import apiRouter from "./routes";
 import { errorResponse } from "./middlewares/error.middleware";
 import { rateLimiter } from "./middlewares/rate-limit.middleware";
-import { FileUploadError } from "./utils/file-upload-error";
-import { fileUpload } from "./lib/file-upload";
 
 dotenv.config()
 
@@ -31,9 +29,12 @@ app.use(express.json());
 
 // app.use(fileUpload)
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 app.use(helmet());
+
+//serve static file
+app.use(express.static("public"))
 
 // cookie middleware
 app.use(cookieParser())
@@ -53,8 +54,6 @@ app.use(errorResponse)
 app.use(logger)
 
 app.listen(PORT, () => {
-
     // winstonLogger.info
-
     console.log(`[server]: Server is running at http://localhost:${PORT}`);
 });
