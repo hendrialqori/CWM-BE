@@ -29,6 +29,34 @@
       "when": 1725856685709,
       "tag": "0003_typical_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1725937458500,
+      "tag": "0004_perpetual_hitman",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1725937686790,
+      "tag": "0005_dashing_silver_sable",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1725937802833,
+      "tag": "0006_yielding_riptide",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1725943299084,
+      "tag": "0007_bright_the_renegades",
+      "breakpoints": true
     }
   ]
 }

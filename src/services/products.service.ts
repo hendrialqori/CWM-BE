@@ -1,12 +1,12 @@
-import type { Request, Response } from 'express'
-import { eq } from 'drizzle-orm'
+import type { Request } from 'express'
+import { eq, sql } from 'drizzle-orm'
 import { db } from '../model/db'
 import { products as productsTable } from '../model/schema'
 import { ResponseError } from '../utils/response-error'
 import { Validation } from '../validation/validation'
 import { ProductsValidation } from '../validation/products.validation'
 
-import { winstonLogger } from '../utils/helpers'
+// import { winstonLogger } from '../utils/helpers'
 import { InsertProduct } from '../types'
 import { FileUploadError } from '../utils/file-upload-error'
 
@@ -97,7 +97,8 @@ export default class ProductService {
 
         const updateProduct = {
             ...productRequest,
-            ...(isImageExist ? { image: imageName } : { image: prevProduct.image })
+            ...(isImageExist ? { image: imageName } : { image: prevProduct.image }),
+            updatedAt: sql`NOW()`,
         }
 
         await db.update(productsTable)

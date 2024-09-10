@@ -2,7 +2,7 @@ import { ne } from "drizzle-orm"
 import type { Request, Response, NextFunction } from "express"
 import ProductService from "../services/products.service"
 
-export default class ProductController {
+export default class ProducstController {
 
     static async list(req: Request, res: Response, next: NextFunction) {
         try {

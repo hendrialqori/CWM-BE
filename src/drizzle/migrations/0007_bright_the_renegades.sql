@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` MODIFY COLUMN `phone` bigint NOT NULL;

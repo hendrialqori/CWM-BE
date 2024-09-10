@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, text, timestamp } from 'drizzle-orm/mysql-core';
+import { mysqlTable, int, bigint ,varchar, text, timestamp } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
 
 const USERS = "users" as const
@@ -22,7 +22,8 @@ export const products = mysqlTable(PRODDUCTS, {
     originalPrice: int("originalPrice").notNull(),
     strikeoutPrice: int("strikeoutPrice").notNull(),
     description: text("description"),
-    createdAt: timestamp("createdAt").defaultNow()
+    createdAt: timestamp("createdAt").defaultNow(),
+    updatedAt: timestamp("updatedAt").defaultNow()
 })
 
 export const productsRelations = relations(products, ({ many }) => ({
@@ -32,11 +33,12 @@ export const productsRelations = relations(products, ({ many }) => ({
 export const transactions = mysqlTable(TRANSACTIONS, {
     id: int("id").primaryKey().autoincrement(),
     email: varchar("email", { length: 100 }).notNull(),
-    phone: int("phone").notNull(),
+    phone: bigint("phone", { mode: "number" }).notNull(),
     productId: int("productId")
         .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
-    createdAt: timestamp("createdAt").defaultNow()
+    createdAt: timestamp("createdAt").defaultNow(),
+    updatedAt: timestamp("updatedAt").defaultNow()
 })
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
