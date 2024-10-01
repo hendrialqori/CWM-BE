@@ -93,7 +93,7 @@ export default class ProductService {
             // remove previous image
             const prevImagePath = path.join(__dirname, "..", "..", "public", "static", prevProduct.image!)
             await unlink(prevImagePath)
-        } 
+        }
 
         const updateProduct = {
             ...productRequest,
@@ -111,12 +111,16 @@ export default class ProductService {
         // check are there product ?
         const product = await ProductService.get(id)
 
+
+        // remove image from static dir
+        const imagePath = path.join(__dirname, "..", "..", "public", "static", product.image!)
+        console.log(imagePath)
+        await unlink(imagePath)
+
         // if exist, remove it from db
         await db.delete(productsTable)
             .where(eq(productsTable.id, id))
 
-        // remove image from static dir
-        const imagePath = path.join(__dirname, "..", "..", "public", "static", product.image!)
-        await unlink(imagePath)
+
     }
 }

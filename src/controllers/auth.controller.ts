@@ -1,6 +1,7 @@
 import { type Request, Response, NextFunction } from "express";
 import AuthService from "../services/auth.service";
 import { type InsertUser } from "../types";
+import { AUTH_COOKIE } from "../constant";
 
 
 export default class AuthController {
@@ -26,6 +27,17 @@ export default class AuthController {
 
             return res.status(200)
                 .json({ message: "Login successfully!" })
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static async profile(req: Request, res: Response, next: NextFunction) {
+        try {
+            const profile = await AuthService.profile(req)
+            return res.status(200)
+                .json({ data: profile, message: "Get profile Successfully!" })
 
         } catch (error) {
             next(error)

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon ./src/main.ts",
     "build": "tsc",
-    "start": "node ./dist/src/main.js",
+    "start": "node ./dist/main.js",
     "db:generate": "drizzle-kit generate",
     "db:drop": "drizzle-kit drop",
     "db:migration": "tsx src/model/migrate.ts"

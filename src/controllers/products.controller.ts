@@ -1,4 +1,3 @@
-import { ne } from "drizzle-orm"
 import type { Request, Response, NextFunction } from "express"
 import ProductService from "../services/products.service"
 

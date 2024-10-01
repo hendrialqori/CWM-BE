@@ -8,6 +8,7 @@ import { ResponseError } from "../utils/response-error";
 import { type InsertUser } from "../types";
 import { authentication, random, winstonLogger } from "../utils/helpers";
 import UserService from "./users.service";
+import { AUTH_COOKIE } from "../constant";
 
 export default class AuthService {
 
@@ -39,7 +40,7 @@ export default class AuthService {
             path: "/",
             expires: new Date(Date.now() + oneWeek),
             httpOnly: true,
-            secure: true,
+            secure: false,
         })
     }
 
@@ -73,6 +74,21 @@ export default class AuthService {
                 .$returningId()
 
         return { ...insertNewUser[0], ...registerRequest }
+    }
+
+    static async profile(request: Request) {
+        const auth_cookie = request.cookies[AUTH_COOKIE] ?? ""
+
+        const selector = {
+            username: usersTable.username,
+            email: usersTable.email,
+            createdAt: usersTable.createdAt
+        }
+
+        const profile = await db.select(selector)
+            .from(usersTable).where(eq(usersTable.sessionToken, auth_cookie))
+
+        return profile[0]
     }
 
     static async logout(request: Request, response: Response) {

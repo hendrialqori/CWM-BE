@@ -5,6 +5,8 @@ import AuthService from "../services/auth.service";
 export async function isAuthenticate(req: Request, res: Response, next: NextFunction) {
     try {
         const session_name = process.env.SESSION_NAME
+
+        // [issue] : session undefined when access through ssr nextjs
         const session = req.cookies[session_name!]
 
         if (!session) {
