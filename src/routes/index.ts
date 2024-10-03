@@ -30,6 +30,7 @@ apiRouter.delete("/api/product/:id/remove", ProductsController.remove)
 apiRouter.get("/api/transaction/list", TransactionsController.list)
 apiRouter.get("/api/transaction/:id", TransactionsController.get)
 apiRouter.post("/api/transaction/add", TransactionsController.add)
+apiRouter.patch("/api/transaction/:id/update-status", TransactionsController.updateStatus)
 apiRouter.delete("/api/transaction/:id/remove", TransactionsController.remove)
 
 

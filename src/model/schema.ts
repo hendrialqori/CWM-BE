@@ -1,5 +1,6 @@
-import { mysqlTable, int, bigint ,varchar, text, timestamp } from 'drizzle-orm/mysql-core';
+import { mysqlTable, mysqlEnum, int, bigint, varchar, text, timestamp } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
+import { STATUS } from '../constant';
 
 const USERS = "users" as const
 const PRODDUCTS = "products" as const
@@ -37,6 +38,7 @@ export const transactions = mysqlTable(TRANSACTIONS, {
     productId: int("productId")
         .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
+    status: mysqlEnum("status", STATUS).default("PENDING"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow()
 })

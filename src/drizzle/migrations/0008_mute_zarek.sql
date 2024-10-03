@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` ADD `status` enum('PENDING','SUCCESS','FAILED');

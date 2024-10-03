@@ -57,6 +57,20 @@
       "when": 1725943299084,
       "tag": "0007_bright_the_renegades",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1727862121567,
+      "tag": "0008_mute_zarek",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1727949766534,
+      "tag": "0009_curved_frank_castle",
+      "breakpoints": true
     }
   ]
 }

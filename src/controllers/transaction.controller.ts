@@ -4,8 +4,15 @@ import { TransactionService } from "../services/transactions.service"
 export class TransactionsController {
     static async list(req: Request, res: Response, next: NextFunction) {
         try {
-            const transactions = await TransactionService.list()
-            return res.status(200).json({ data: transactions, message: "Successfully" })
+            const result = await TransactionService.list(req)
+            return res
+                .status(200)
+                .json({
+                    data: result.transactions,
+                    meta: result.meta,
+                    message: "Successfully"
+                })
+
         } catch (error) {
             next(error)
         }
@@ -33,7 +40,18 @@ export class TransactionsController {
         }
     }
 
-    static async update() { }
+    static async updateStatus(req: Request, res: Response, next: NextFunction) {
+        try {
+            const params = req.params as unknown as { id: number }
+
+            await TransactionService.updateStatus(params.id, req)
+            return res.status(200)
+                .json({ data: null, message: `Successfully update status product with id ${params.id}` })
+
+        } catch (error) {
+            next(error)
+        }
+    }
 
     static async remove(req: Request, res: Response, next: NextFunction) {
         try {

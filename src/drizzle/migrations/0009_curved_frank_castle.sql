@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` MODIFY COLUMN `status` enum('PENDING','SUCCESS','FAILED') DEFAULT 'PENDING';
