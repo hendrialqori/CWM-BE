@@ -1,12 +1,14 @@
 import { type Request, type Response } from "express";
+import bycript from "bcrypt"
+import jwt from "jsonwebtoken"
 import { eq } from "drizzle-orm";
 import { db } from "../model/db";
 import { users as usersTable } from "../model/schema";
 import { Validation } from "../validation/validation";
 import { AuthValidation } from "../validation/auth.validation";
-import { ResponseError } from "../utils/response-error";
+import { ResponseError } from "../utils/errors";
 import { type InsertUser } from "../types";
-import { authentication, random, winstonLogger } from "../utils/helpers";
+// import { authentication, random, winstonLogger } from "../utils/helpers";
 import UserService from "./users.service";
 import { AUTH_COOKIE } from "../constant";
 
@@ -15,33 +17,30 @@ export default class AuthService {
     static async login(request: Omit<InsertUser, 'username'>, response: Response) {
 
         // administratorMeggie
-
         const loginRequest = Validation.validate(AuthValidation.LOGIN, request)
 
-        const checkEmail = await AuthService.emailChecker(loginRequest.email)
-        if (!checkEmail || !checkEmail.length) {
+        const [user] = await AuthService.emailChecker(loginRequest.email)
+        if (!user) {
             throw new ResponseError(404, 'Email not found!')
         }
 
-        const user = checkEmail[0]
-        const expectHash = authentication(user.salt!, loginRequest.password)
-        if (user.password !== expectHash) {
+        // password match checker
+        const isPasswordValid = await bycript.compare(loginRequest.password, user.password)
+        if (!isPasswordValid) {
             throw new ResponseError(400, "Wrong password!")
         }
 
-        user.sessionToken = authentication(random(), user.password)
-
-        await UserService.update(user.id, user)
-
-        const oneWeek = 7 * 24 * 3600 * 1000; //1 weeks
-
-        response.cookie(process.env.SESSION_NAME!, user.sessionToken, {
-            domain: process.env.DOMAIN,
-            path: "/",
-            expires: new Date(Date.now() + oneWeek),
-            httpOnly: true,
-            secure: false,
+        // generate jwt token
+        const payload = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+        }
+        const token = jwt.sign(payload, process.env.SECRET, {
+            expiresIn: 30,
         })
+
+        return token
     }
 
     static async register(request: InsertUser) {
@@ -58,19 +57,30 @@ export default class AuthService {
             throw new ResponseError(400, "Email already exists!")
         }
 
-        const salt = random()
-
-        const user = {
+        // Number of salt rounds (the higher, the more secure but slower the hash generation) 
+        const saltRounds = 10
+        // hashing password
+        const hashingPassword = await bycript.hash(registerRequest.password, saltRounds)
+        // store data for new user
+        const newUser = {
             username: registerRequest.username,
             email: registerRequest.email,
-            salt,
-            password: authentication(salt, registerRequest.password)
+            password: hashingPassword
         }
+
+        // const salt = random()
+
+        // const user = {
+        //     username: registerRequest.username,
+        //     email: registerRequest.email,
+        //     salt,
+        //     password: authentication(salt, registerRequest.password)
+        // }
 
         const insertNewUser =
             await db
                 .insert(usersTable)
-                .values(user)
+                .values(newUser)
                 .$returningId()
 
         return { ...insertNewUser[0], ...registerRequest }
@@ -109,7 +119,8 @@ export default class AuthService {
         await UserService.update(currentUSer.id, currentUSer)
 
         response.clearCookie(session_name!, {
-            domain: process.env.DOMAIN,
+            httpOnly: true,
+            secure: false,
             path: "/",
         })
 

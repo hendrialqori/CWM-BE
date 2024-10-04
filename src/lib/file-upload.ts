@@ -1,5 +1,5 @@
 import multer from "multer";
-import { FileUploadError } from "../utils/file-upload-error";
+import { FileUploadError } from "../utils/errors";
 import { MAX_IMAGE_SIZE } from "../constant";
 
 // const storage = multer.diskStorage({

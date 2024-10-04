@@ -10,7 +10,7 @@ import {
 import { Query, type InsertTransaction, Transaction } from "../types";
 import { Validation } from "../validation/validation";
 import { TransactionsValidation } from "../validation/transactions.validation";
-import { ResponseError } from "../utils/response-error";
+import { ResponseError } from "../utils/errors";
 
 export class TransactionService {
     private static COLUMN = {

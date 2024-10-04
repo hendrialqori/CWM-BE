@@ -2,13 +2,12 @@ import type { Request } from 'express'
 import { eq, sql } from 'drizzle-orm'
 import { db } from '../model/db'
 import { products as productsTable } from '../model/schema'
-import { ResponseError } from '../utils/response-error'
+import * as Error from '../utils/errors'
 import { Validation } from '../validation/validation'
 import { ProductsValidation } from '../validation/products.validation'
 
 // import { winstonLogger } from '../utils/helpers'
 import { InsertProduct } from '../types'
-import { FileUploadError } from '../utils/file-upload-error'
 
 import radash from 'radash'
 import { writeFile, unlink } from 'fs/promises'
@@ -33,7 +32,7 @@ export default class ProductService {
         const product = products[0]
 
         if (!radash.isObject(product)) {
-            throw new ResponseError(404, `Product not found with id ${id}`)
+            throw new Error.ResponseError(404, `Product not found with id ${id}`)
         }
 
         return product
@@ -48,7 +47,7 @@ export default class ProductService {
 
         // validate image
         if (!radash.isObject(image)) {
-            throw new FileUploadError(400, "Image required")
+            throw new Error.FileUploadError(400, "Image required")
         }
 
         const imageName = Date.now() + "-" + image.originalname

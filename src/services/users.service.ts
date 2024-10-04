@@ -3,7 +3,7 @@ import { db } from '../model/db'
 import { users as usersTable } from '../model/schema'
 import type { User } from '../types'
 import radash from 'radash'
-import { ResponseError } from '../utils/response-error'
+import { ResponseError } from '../utils/errors'
 
 class UserService {
     static async list() {

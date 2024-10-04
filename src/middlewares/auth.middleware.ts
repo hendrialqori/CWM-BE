@@ -1,29 +1,21 @@
 import { Request, Response, NextFunction } from "express";
-import { ResponseError } from "../utils/response-error";
-import AuthService from "../services/auth.service";
+import jwt from "jsonwebtoken"
+import { AuthenticationError } from "../utils/errors";
 
-export async function isAuthenticate(req: Request, res: Response, next: NextFunction) {
+export async function accessValidation(req: Request, res: Response, next: NextFunction) {
     try {
-        const session_name = process.env.SESSION_NAME
-
-        // [issue] : session undefined when access through ssr nextjs
-        const session = req.cookies[session_name!]
-
-        if (!session) {
-            throw new ResponseError(403, "Session has expired!")
-        }
-
-        const sessionChecker = await AuthService.sessionTokenChecker(session)
-        const user = sessionChecker
-
-        if (!user || !user.length) {
-            throw new ResponseError(404, "Forbidden!")
-        }
+        // header
+        const authorization = req.headers.authorization
+        // token
+        const token = authorization.split(" ")[1]
+        // secret key
+        const secret = process.env.SECRET
+        // verify token
+        jwt.verify(token, secret)
 
         next()
 
     } catch (error) {
-        next(error)
+        next(new AuthenticationError(401, "Unauthorized"))
     }
-
 }

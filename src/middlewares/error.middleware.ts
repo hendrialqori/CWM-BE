@@ -1,8 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ZodError } from 'zod'
-import { ResponseError } from "../utils/response-error";
+import * as Error from "../utils/errors"
 import { winstonLogger } from "../utils/helpers";
-import { FileUploadError } from "../utils/file-upload-error";
 import multer from "multer";
 
 export function errorResponse(error: Error, request: Request, response: Response, next: NextFunction) {
@@ -17,7 +16,7 @@ export function errorResponse(error: Error, request: Request, response: Response
             errors: error.flatten()
         })
 
-    } else if (error instanceof ResponseError) {
+    } else if (error instanceof Error.ResponseError) {
         winstonLogger.error("Response Error", {
             ip: request.ip
         })
@@ -27,13 +26,23 @@ export function errorResponse(error: Error, request: Request, response: Response
             errors: error.message
         });
 
-    } else if (error instanceof multer.MulterError || error instanceof FileUploadError) {
+    } else if (error instanceof multer.MulterError || error instanceof Error.FileUploadError) {
         winstonLogger.error("File Upload Error", {
             message: error.stack
         })
 
         response.status(400).json({
             type: `File upload Error`,
+            errors: error.message
+        })
+
+    } else if (error instanceof Error.AuthenticationError) {
+        winstonLogger.error("Authentication Error", {
+            message: error.stack
+        })
+
+        response.status(401).json({
+            type: `Authentication Error`,
             errors: error.message
         })
 

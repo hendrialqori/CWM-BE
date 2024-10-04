@@ -23,10 +23,10 @@ export default class AuthController {
     static async login(req: Request, res: Response, next: NextFunction) {
         try {
             const request = req.body as Omit<InsertUser, 'username'>
-            await AuthService.login(request, res)
+            const access_token = await AuthService.login(request, res)
 
             return res.status(200)
-                .json({ message: "Login successfully!" })
+                .json({ data: { access_token }, message: "Login successfully!" })
 
         } catch (error) {
             next(error)
