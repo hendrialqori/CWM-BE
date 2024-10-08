@@ -8,7 +8,6 @@ import { Validation } from "../validation/validation";
 import { AuthValidation } from "../validation/auth.validation";
 import { ResponseError } from "../utils/errors";
 import { type InsertUser } from "../types";
-// import { authentication, random, winstonLogger } from "../utils/helpers";
 import UserService from "./users.service";
 import { AUTH_COOKIE } from "../constant";
 
@@ -35,12 +34,17 @@ export default class AuthService {
             id: user.id,
             email: user.email,
             username: user.username,
+            createdAt: user.createdAt
         }
+        const expiresIn = 60 * 60 * 24 * 7
+        // format 
+
         const token = jwt.sign(payload, process.env.SECRET, {
-            expiresIn: "1 days",
+            expiresIn
+            // expiresIn: //1 minute
         })
 
-        return token
+        return { ...payload, access_token: token }
     }
 
     static async register(request: InsertUser) {
@@ -68,15 +72,6 @@ export default class AuthService {
             password: hashingPassword
         }
 
-        // const salt = random()
-
-        // const user = {
-        //     username: registerRequest.username,
-        //     email: registerRequest.email,
-        //     salt,
-        //     password: authentication(salt, registerRequest.password)
-        // }
-
         const insertNewUser =
             await db
                 .insert(usersTable)
@@ -101,6 +96,8 @@ export default class AuthService {
         return profile[0]
     }
 
+
+    // deprecated
     static async logout(request: Request, response: Response) {
 
         const session_name = process.env.SESSION_NAME

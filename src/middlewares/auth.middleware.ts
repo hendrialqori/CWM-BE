@@ -11,7 +11,9 @@ export async function accessValidation(req: Request, res: Response, next: NextFu
         // secret key
         const secret = process.env.SECRET
         // verify token
-        jwt.verify(token, secret)
+        const payload = jwt.verify(token, secret)
+        //@ts-ignore
+        req.payload = payload
 
         next()
 
