@@ -36,8 +36,7 @@ export default class AuthService {
             username: user.username,
             createdAt: user.createdAt
         }
-        const expiresIn = 60 * 60 * 24 * 7
-        // format 
+        const expiresIn = 60 * 60 * 24 * 7 // 7 days
 
         const token = jwt.sign(payload, process.env.SECRET, {
             expiresIn

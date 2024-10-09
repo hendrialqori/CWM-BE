@@ -15,6 +15,7 @@ import { ResponseError } from "../utils/errors";
 export class TransactionService {
     private static COLUMN = {
         id: transactionsTable.id,
+        name: transactionsTable.name,
         email: transactionsTable.email,
         phone: transactionsTable.phone,
         status: transactionsTable.status,
@@ -26,6 +27,8 @@ export class TransactionService {
             strikeoutPrice: productsTable.strikeoutPrice,
             description: productsTable.description
         },
+        invoiceId: transactionsTable.invoiceId,
+        invoiceUrl: transactionsTable.invoiceUrl,
         createdAt: transactionsTable.createdAt,
         updatedAt: transactionsTable.updatedAt
     }

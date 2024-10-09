@@ -14,13 +14,35 @@ import { writeFile, unlink } from 'fs/promises'
 import path from 'path'
 
 export default class ProductService {
+    private static COLUMN = {
+        id: productsTable.id,
+        image: productsTable.image,
+        originalPrice: productsTable.originalPrice,
+        strikeOutPrice: productsTable.strikeoutPrice,
+        description: productsTable.description
+    }
 
     static async list() {
         const products = await db
-            .select()
+            .select(ProductService.COLUMN)
             .from(productsTable)
 
         return products
+    }
+
+    static async getOffer() {
+        const [offer] = await db
+            .select(ProductService.COLUMN)
+            .from(productsTable)
+            .where((eq(productsTable.isOffer, true)))
+
+
+        if (!radash.isObject(offer)) {
+            throw new Error.ResponseError(404, `No one products has isOffer property is true`)
+        }
+
+        return offer
+
     }
 
     static async get(id: number) {

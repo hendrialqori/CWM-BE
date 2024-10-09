@@ -71,6 +71,41 @@
       "when": 1727949766534,
       "tag": "0009_curved_frank_castle",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1728455337673,
+      "tag": "0010_majestic_alice",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1728458146377,
+      "tag": "0011_needy_vampiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1728459336616,
+      "tag": "0012_vengeful_firedrake",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1728459391406,
+      "tag": "0013_tearful_clea",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1728467402031,
+      "tag": "0014_mighty_red_wolf",
+      "breakpoints": true
     }
   ]
 }

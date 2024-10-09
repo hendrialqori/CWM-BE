@@ -14,10 +14,21 @@ export default class ProducstController {
         }
     }
 
+    static async getOffer(req: Request, res: Response, next: NextFunction) {
+        try {
+            const data = await ProductService.getOffer()
+            return res.status(200)
+                .json({ data, message: "Successfully" })
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
     static async get(req: Request, res: Response, next: NextFunction) {
         try {
             const params = req.params as unknown as { id: number }
-            
+
             const data = await ProductService.get(params.id)
             return res.status(200)
                 .json({ data, message: "Successfully" })

@@ -1,4 +1,4 @@
-import { mysqlTable, mysqlEnum, int, bigint, varchar, text, timestamp } from 'drizzle-orm/mysql-core';
+import { mysqlTable, mysqlEnum, int, bigint, varchar, text, timestamp, boolean } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
 import { STATUS } from '../constant';
 
@@ -22,7 +22,9 @@ export const products = mysqlTable(PRODDUCTS, {
     image: text("image"),
     originalPrice: int("originalPrice").notNull(),
     strikeoutPrice: int("strikeoutPrice").notNull(),
+    link: text("link"),
     description: text("description"),
+    isOffer: boolean("isOffer").default(false),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow()
 })
@@ -33,11 +35,14 @@ export const productsRelations = relations(products, ({ many }) => ({
 
 export const transactions = mysqlTable(TRANSACTIONS, {
     id: int("id").primaryKey().autoincrement(),
+    name: varchar("name", { length: 225 }).notNull(),
     email: varchar("email", { length: 100 }).notNull(),
     phone: bigint("phone", { mode: "number" }).notNull(),
     productId: int("productId")
         .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
+    invoiceId: text("invoiceId").notNull(),
+    invoiceUrl: text("invoiceUrl").notNull(),
     status: mysqlEnum("status", STATUS).default("PENDING"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow()
