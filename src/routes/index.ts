@@ -21,8 +21,10 @@ apiRouter.get("/api/user/:id", accessValidation, UsersController.get)
 // apiRouter.delete("/api/user/:id/remove", accessValidation, UsersController.remove)
 
 // products
-apiRouter.get("/api/product/list", ProductsController.list)
-apiRouter.get("/api/product/offer", ProductsController.getOffer)
+apiRouter.get("/api/product/list/public", ProductsController.list)
+apiRouter.get("/api/product/offer/public", ProductsController.getOffer)
+
+apiRouter.get("/api/product/list", accessValidation, ProductsController.listPrivate)
 apiRouter.get("/api/product/:id", accessValidation, ProductsController.get)
 apiRouter.post("/api/product/add", [accessValidation, fileUpload.single("image")], ProductsController.add)
 apiRouter.put("/api/product/:id/update", [accessValidation, fileUpload.single("image")], ProductsController.update)
@@ -37,6 +39,7 @@ apiRouter.get("/api/transaction/:id", accessValidation, TransactionsController.g
 
 // payment
 apiRouter.post("/api/payment/invoice/create", PaymentController.createInvoice)
+apiRouter.post("/api/payment/webhook", PaymentController.webhook)
 
 export default apiRouter
 

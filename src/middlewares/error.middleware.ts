@@ -46,6 +46,15 @@ export function errorResponse(error: Error, request: Request, response: Response
             errors: error.message
         })
 
+    } else if (error instanceof Error.PaymentError) {
+        winstonLogger.error("Authentication Error", {
+            message: error.stack
+        })
+
+        response.status(401).json({
+            type: `Payment Error`,
+            errors: error.message
+        })
     } else {
         winstonLogger.error("Unknown Error", {
             message: error.stack

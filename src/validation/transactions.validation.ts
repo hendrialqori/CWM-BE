@@ -7,7 +7,9 @@ export class TransactionsValidation {
         email: z.string().min(1, "Required").email("Not valid email"),
         phone: z.number().nonnegative("Non negative number"),
         productId: z.string().min(1, { message: "Required" }),
-    }) 
+        invoiceId: z.string().min(1, { message: "Required" }).optional(),
+        invoiceUrl: z.string().min(1, { message: "Required" }).optional()
+    })
 
     static readonly UPDATE_STATUS: ZodType = z.object({
         status: z.enum(STATUS)

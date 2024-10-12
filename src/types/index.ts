@@ -14,5 +14,9 @@ export type Product = typeof products.$inferSelect
 export type InsertProduct = typeof products.$inferInsert
 
 export type Transaction = typeof transactions.$inferSelect
-export type InsertTransaction = typeof transactions.$inferInsert
+export type InsertTransaction = typeof transactions.$inferInsert & {
+    externalId?: string
+    invoiceId?: string;
+    invoiceUrl?: string
+}
 

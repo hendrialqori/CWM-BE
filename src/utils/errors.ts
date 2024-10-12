@@ -15,3 +15,9 @@ export class AuthenticationError extends Error {
         super(message)
     }
 }
+
+export class PaymentError extends Error {
+    constructor(public status: number, public message: string) {
+        super(message)
+    }
+}

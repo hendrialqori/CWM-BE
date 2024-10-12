@@ -14,6 +14,17 @@ export default class ProducstController {
         }
     }
 
+    static async listPrivate(req: Request, res: Response, next: NextFunction) {
+        try {
+            const products = await ProductService.listPrivate()
+            return res.status(200)
+                .json({ data: products, message: "Successfully" })
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
     static async getOffer(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await ProductService.getOffer()

@@ -41,8 +41,9 @@ export const transactions = mysqlTable(TRANSACTIONS, {
     productId: int("productId")
         .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
-    invoiceId: text("invoiceId").notNull(),
-    invoiceUrl: text("invoiceUrl").notNull(),
+    externalId: varchar("externalId", { length: 225 }), // from invoice xendit
+    invoiceId: text("invoiceId"), // from invoice xendit
+    invoiceUrl: text("invoiceUrl"), // from invoice xendit
     status: mysqlEnum("status", STATUS).default("PENDING"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow()

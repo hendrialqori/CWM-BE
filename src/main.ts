@@ -9,6 +9,7 @@ import { logger } from "./utils/helpers";
 import apiRouter from "./routes";
 import { errorResponse } from "./middlewares/error.middleware";
 import { rateLimiter } from "./middlewares/rate-limit.middleware";
+import morgan from "morgan"
 
 dotenv.config()
 
@@ -21,13 +22,13 @@ app.use(cors({
     origin: process.env.ORIGIN
 }))
 
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms"))
+
 app.use(rateLimiter)
 
 app.use(compression())
 
 app.use(express.json());
-
-// app.use(fileUpload)
 
 app.use(express.urlencoded({ extended: false }));
 

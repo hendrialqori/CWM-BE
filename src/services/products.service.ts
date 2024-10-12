@@ -7,7 +7,7 @@ import { Validation } from '../validation/validation'
 import { ProductsValidation } from '../validation/products.validation'
 
 // import { winstonLogger } from '../utils/helpers'
-import { InsertProduct } from '../types'
+import { InsertProduct, Product } from '../types'
 
 import radash from 'radash'
 import { writeFile, unlink } from 'fs/promises'
@@ -17,14 +17,25 @@ export default class ProductService {
     private static COLUMN = {
         id: productsTable.id,
         image: productsTable.image,
+        title: productsTable.title,
         originalPrice: productsTable.originalPrice,
-        strikeOutPrice: productsTable.strikeoutPrice,
+        strikeoutPrice: productsTable.strikeoutPrice,
         description: productsTable.description
     }
 
     static async list() {
         const products = await db
             .select(ProductService.COLUMN)
+            .from(productsTable)
+            .where((eq(productsTable.isOffer, false)))
+
+        return products
+    }
+
+    // only for administrator
+    static async listPrivate() {
+        const products = await db
+            .select({ ...ProductService.COLUMN, isOffer: productsTable.isOffer, link: productsTable.link })
             .from(productsTable)
 
         return products
@@ -42,7 +53,6 @@ export default class ProductService {
         }
 
         return offer
-
     }
 
     static async get(id: number) {
@@ -65,7 +75,7 @@ export default class ProductService {
         const image = request.file!
 
         //validation
-        const productRequest = Validation.validate(ProductsValidation.ADD, body)
+        const productRequest = Validation.validate(ProductsValidation.ADD, body) as Product
 
         // validate image
         if (!radash.isObject(image)) {
@@ -79,6 +89,11 @@ export default class ProductService {
         const newProduct = { ...productRequest, image: imageName }
 
         await writeFile(imagePath, imageBuffer);
+
+        // if request body isOffer is true, force all data that have become isOffer=false
+        if (productRequest.isOffer) {
+            await ProductService.forceIsOfferEqualIsFalse()
+        }
 
         const insertNewProduct = await db
             .insert(productsTable)
@@ -96,7 +111,7 @@ export default class ProductService {
         const isImageExist = radash.isObject(image)
 
         // validation
-        const productRequest = Validation.validate(ProductsValidation.ADD, body)
+        const productRequest = Validation.validate(ProductsValidation.ADD, body) as Product
         // previous product
         const prevProduct = await ProductService.get(id)
 
@@ -107,10 +122,8 @@ export default class ProductService {
             imageName = Date.now() + "-" + image.originalname
             imageBuffer = image.buffer
             imagePath = path.join(__dirname, "..", "..", "public", "static", imageName);
-
             // add new image
             await writeFile(imagePath, imageBuffer)
-
             // remove previous image
             const prevImagePath = path.join(__dirname, "..", "..", "public", "static", prevProduct.image!)
             await unlink(prevImagePath)
@@ -122,6 +135,11 @@ export default class ProductService {
             updatedAt: sql`NOW()`,
         }
 
+        // if request body isOffer is true, force all data that have become isOffer=false
+        if (updateProduct.isOffer) {
+            await ProductService.forceIsOfferEqualIsFalse()
+        }
+
         await db.update(productsTable)
             .set(updateProduct)
             .where(eq(productsTable.id, id))
@@ -131,17 +149,17 @@ export default class ProductService {
     static async remove(id: number) {
         // check are there product ?
         const product = await ProductService.get(id)
-
-
         // remove image from static dir
         const imagePath = path.join(__dirname, "..", "..", "public", "static", product.image!)
-        console.log(imagePath)
         await unlink(imagePath)
 
         // if exist, remove it from db
         await db.delete(productsTable)
             .where(eq(productsTable.id, id))
+    }
 
-
+    static async forceIsOfferEqualIsFalse() {
+        const data = { isOffer: false } as unknown as InsertProduct
+        await db.update(productsTable).set(data)
     }
 }

@@ -27,6 +27,7 @@ export class TransactionService {
             strikeoutPrice: productsTable.strikeoutPrice,
             description: productsTable.description
         },
+        externalId: transactionsTable.externalId,
         invoiceId: transactionsTable.invoiceId,
         invoiceUrl: transactionsTable.invoiceUrl,
         createdAt: transactionsTable.createdAt,

@@ -4,4 +4,4 @@ export const ALLOWS_MIME_TYPE = ["image/png", "image/jpg", "image/jpeg"] as cons
 
 export const AUTH_COOKIE = "auth-cookie"
 
-export const STATUS = ["PENDING", "SUCCESS", "FAILED"] as const
+export const STATUS = ["PENDING", "SETTLED", "FAILED"] as const

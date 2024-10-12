@@ -18,4 +18,20 @@ export default class PaymentController {
             next(error)
         }
     }
+
+    static async webhook(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { status, message } = await PaymentService.webhook(req)
+
+            const X_CALLBACK_TOKEN = process.env.XENDIT_CALLBACK_TOKEN
+            return res
+                .setHeader("x-callback-token", X_CALLBACK_TOKEN)
+                .status(201)
+                .json({ data: { status }, message })
+
+
+        } catch (error) {
+            next(error)
+        }
+    }
 }
