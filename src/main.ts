@@ -4,12 +4,15 @@ import cors from "cors"
 import compression from "compression"
 import cookieParser from "cookie-parser"
 import helmet from "helmet"
+import morgan from "morgan"
 
-import { logger } from "./utils/helpers";
 import apiRouter from "./routes";
+import { logger } from "./utils/helpers";
 import { errorResponse } from "./middlewares/error.middleware";
 import { rateLimiter } from "./middlewares/rate-limit.middleware";
-import morgan from "morgan"
+import { FRONTEND_ORIGIN } from "./constant";
+import { EMAIL_SERVER } from "./configs/email-server";
+import hbs from "nodemailer-express-handlebars";
 
 dotenv.config()
 
@@ -19,7 +22,7 @@ const app = express()
 
 app.use(cors({
     credentials: true,
-    origin: process.env.ORIGIN
+    origin: FRONTEND_ORIGIN
 }))
 
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms"))

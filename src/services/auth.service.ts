@@ -8,8 +8,7 @@ import { Validation } from "../validation/validation";
 import { AuthValidation } from "../validation/auth.validation";
 import { ResponseError } from "../utils/errors";
 import { type InsertUser } from "../types";
-import UserService from "./users.service";
-import { AUTH_COOKIE } from "../constant";
+import { SECRET_KEY } from "../constant";
 
 export default class AuthService {
 
@@ -38,7 +37,7 @@ export default class AuthService {
         }
         const expiresIn = 60 * 60 * 24 * 7 // 7 days
 
-        const token = jwt.sign(payload, process.env.SECRET, {
+        const token = jwt.sign(payload, SECRET_KEY, {
             expiresIn
             // expiresIn: //1 minute
         })
@@ -80,47 +79,6 @@ export default class AuthService {
         return { ...insertNewUser[0], ...registerRequest }
     }
 
-    static async profile(request: Request) {
-        const auth_cookie = request.cookies[AUTH_COOKIE] ?? ""
-
-        const selector = {
-            username: usersTable.username,
-            email: usersTable.email,
-            createdAt: usersTable.createdAt
-        }
-
-        const profile = await db.select(selector)
-            .from(usersTable).where(eq(usersTable.sessionToken, auth_cookie))
-
-        return profile[0]
-    }
-
-
-    // deprecated
-    static async logout(request: Request, response: Response) {
-
-        const session_name = process.env.SESSION_NAME
-        const session = request.cookies[session_name!]
-
-        const sessionChecker = await AuthService.sessionTokenChecker(session)
-        const users = sessionChecker
-
-        if (!users || !users.length) {
-            throw new ResponseError(404, "User not found")
-        }
-
-        const currentUSer = users[0]
-        currentUSer.sessionToken = null
-
-        await UserService.update(currentUSer.id, currentUSer)
-
-        response.clearCookie(session_name!, {
-            httpOnly: true,
-            secure: false,
-            path: "/",
-        })
-
-    }
 
     private static async emailChecker(email: string) {
         return await db.select().from(usersTable).where(eq(usersTable.email, email))

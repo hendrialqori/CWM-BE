@@ -21,3 +21,9 @@ export class PaymentError extends Error {
         super(message)
     }
 }
+
+export class EmailSenderError extends Error {
+    constructor(public status: number, public message: string) {
+        super(message)
+    }
+}

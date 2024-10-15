@@ -1,5 +1,8 @@
 import type { CreateInvoiceRequest, Invoice, InvoiceStatus } from "xendit-node/invoice/models";
-import { Request, Response } from "express";
+import { Request } from "express";
+import { eq } from "drizzle-orm";
+import ejs from "ejs"
+
 import { XENDIT_CLIENT } from "../configs/xendit-client";
 import ProductService from "./products.service";
 import { InsertTransaction } from "../types";
@@ -8,9 +11,15 @@ import { TransactionsValidation } from "../validation/transactions.validation";
 
 import { db } from "../model/db";
 import { transactions as transactionsTable } from "../model/schema"
-import { eq } from "drizzle-orm";
-import { STATUS } from "../constant";
-import { PaymentError, ResponseError } from "../utils/errors";
+import { EmailSenderError, PaymentError, ResponseError } from "../utils/errors";
+import {
+    EMAIL_SERVER_HOST, EMAIL_SERVER_PASSWORD, EMAIL_SERVER_PORT,
+    EMAIL_SERVER_SERVICE, EMAIL_SERVER_USER,
+    FAILED_PAYMENT_URL, STATUS, SUCCESS_PAYMENT_URL, XENDIT_CALLBACK_TOKEN
+} from "@/constant";
+import { emailTemplate } from "@/utils/email-template";
+import { EMAIL_SERVER } from "../configs/email-server";
+
 
 export default class PaymentService {
 
@@ -80,7 +89,7 @@ export default class PaymentService {
             items: [
                 {
                     referenceId: String(product.id),
-                    name: product.title,
+                    name: product.title ?? "",
                     price: product.originalPrice,
                     quantity: 1,
                     category: "Ebook"
@@ -91,8 +100,8 @@ export default class PaymentService {
                 invoicePaid: ["whatsapp", "email"],
                 invoiceReminder: ["whatsapp", "email"]
             },
-            successRedirectUrl: process.env.SUCCESS_PAYMENT_URL,
-            failureRedirectUrl: process.env.FAILED_PAYMENT_URL
+            successRedirectUrl: SUCCESS_PAYMENT_URL,
+            failureRedirectUrl: FAILED_PAYMENT_URL
         }
 
         // create invoice xendit payment
@@ -109,6 +118,26 @@ export default class PaymentService {
         return { invoiceUrl: invoice.invoiceUrl }
     }
 
+    static async emailSender() {
+        const template =
+            await ejs.renderFile(__dirname + "/../.." + "/views/email.ejs", {name: "Jokowi", productName: "Chinesewithmeggie jokowi"})
+
+        try {
+            const info = await EMAIL_SERVER.sendMail({
+                from: "Hendri alqori <teamhendri18@gmail.com>",
+                to: "teamhendri18@gmail.com",
+                subject: "Informasi pembelian e-book di chinesewithmeggie", // Subject line
+                html: template
+            })
+
+            return info.messageId
+
+        } catch (error) {
+            const errorMessage = (error as Error).message
+            throw new EmailSenderError(502, errorMessage)
+        }
+    }
+
     static async webhook(request: Request) {
         const { id } = request.body as { id: string }
 
@@ -122,7 +151,7 @@ export default class PaymentService {
 
         //x-callback-token
         const X_CALLBACK_TOKEN_CLIENT = request.headers["x-callback-token"]
-        const X_CALLBACK_TOKEN_SERVER = process.env.XENDIT_CALLBACK_TOKEN
+        const X_CALLBACK_TOKEN_SERVER = XENDIT_CALLBACK_TOKEN
 
         // token header required
         if (!X_CALLBACK_TOKEN_CLIENT) {
@@ -135,9 +164,9 @@ export default class PaymentService {
         }
 
         type WebhookResponse = { status: InvoiceStatus, message: string }
-        type MappingStatus = Record<InvoiceStatus, () => Promise<WebhookResponse> | WebhookResponse>
+        type IMappingStatus = Record<InvoiceStatus, () => Promise<WebhookResponse> | WebhookResponse>
 
-        const mappingStatus: MappingStatus = {
+        const mappingStatus: IMappingStatus = {
             SETTLED: async () => {
                 await PaymentService.updateStatusTransaction({
                     externalId: invoice.externalId, status: "SETTLED"

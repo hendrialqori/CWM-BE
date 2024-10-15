@@ -3,7 +3,6 @@ import AuthService from "../services/auth.service";
 import { type InsertUser } from "../types";
 
 export default class AuthController {
-
     static async register(req: Request, res: Response, next: NextFunction) {
         try {
             const request = req.body as InsertUser
@@ -25,27 +24,6 @@ export default class AuthController {
 
             return res.status(200)
                 .json({ data , message: "Login successfully!" })
-
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    static async profile(req: Request, res: Response, next: NextFunction) {
-        try {
-            const profile = await AuthService.profile(req)
-            return res.status(200)
-                .json({ data: profile, message: "Get profile Successfully!" })
-
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    static async logout(req: Request, res: Response, next: NextFunction) {
-        try {
-            await AuthService.logout(req, res)
-            return res.sendStatus(200)
 
         } catch (error) {
             next(error)

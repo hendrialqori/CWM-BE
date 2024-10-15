@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken"
 import { AuthenticationError } from "../utils/errors";
+import { SECRET_KEY } from "../constant";
 
 export async function accessValidation(req: Request, res: Response, next: NextFunction) {
     try {
@@ -8,10 +9,8 @@ export async function accessValidation(req: Request, res: Response, next: NextFu
         const authorization = req.headers.authorization
         // token
         const token = authorization.split(" ")[1]
-        // secret key
-        const secret = process.env.SECRET
         // verify token
-        const payload = jwt.verify(token, secret)
+        const payload = jwt.verify(token, SECRET_KEY)
         //@ts-ignore
         req.payload = payload
 

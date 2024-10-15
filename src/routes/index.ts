@@ -12,8 +12,6 @@ const apiRouter = express.Router()
 // auth
 apiRouter.post("/api/auth/register", AuthController.register)
 apiRouter.post("/api/auth/login", AuthController.login)
-apiRouter.get("/api/auth/profile", AuthController.profile)
-apiRouter.delete("/api/auth/logout", AuthController.logout)
 
 // users
 // apiRouter.get("/api/user/list", accessValidation, UsersController.list)
@@ -40,6 +38,7 @@ apiRouter.get("/api/transaction/:id", accessValidation, TransactionsController.g
 // payment
 apiRouter.post("/api/payment/invoice/create", PaymentController.createInvoice)
 apiRouter.post("/api/payment/webhook", PaymentController.webhook)
+apiRouter.get("/api/payment/email/sender", PaymentController.emailSender)
 
 export default apiRouter
 

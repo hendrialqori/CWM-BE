@@ -51,8 +51,17 @@ export function errorResponse(error: Error, request: Request, response: Response
             message: error.stack
         })
 
-        response.status(401).json({
+        response.status(error.status).json({
             type: `Payment Error`,
+            errors: error.message
+        })
+    } else if (error instanceof Error.EmailSenderError) {
+        winstonLogger.error("Email sender Error", {
+            message: error.stack
+        })
+
+        response.status(error.status).json({
+            type: `Email sender Error`,
             errors: error.message
         })
     } else {
