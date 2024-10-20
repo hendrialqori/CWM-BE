@@ -11,21 +11,34 @@ import { TransactionsValidation } from "../validation/transactions.validation";
 
 import { db } from "../model/db";
 import { transactions as transactionsTable } from "../model/schema"
+import { products as productsTable } from "../model/schema";
 import { EmailSenderError, PaymentError, ResponseError } from "../utils/errors";
 import {
-    EMAIL_SERVER_HOST, EMAIL_SERVER_PASSWORD, EMAIL_SERVER_PORT,
-    EMAIL_SERVER_SERVICE, EMAIL_SERVER_USER,
-    FAILED_PAYMENT_URL, STATUS, SUCCESS_PAYMENT_URL, XENDIT_CALLBACK_TOKEN
-} from "@/constant";
-import { emailTemplate } from "@/utils/email-template";
+    FAILED_PAYMENT_URL, STATUS, SUCCESS_PAYMENT_URL, XENDIT_CALLBACK_TOKEN,
+    EMAIL_SENDER_FROM, EMAIL_SENDER_SUBJECT, SERVER_ORIGIN
+} from "../constant";
 import { EMAIL_SERVER } from "../configs/email-server";
+import { StatusCodes } from "http-status-codes";
+import path from "path";
 
 
 export default class PaymentService {
-
     private static invoiceClient = XENDIT_CLIENT.Invoice
 
-    static async getTransactionByExternalId(externalId: string) {
+    private static async getProduct(id: number) {
+        const [product] = await db
+            .select()
+            .from(productsTable)
+            .where(eq(productsTable.id, id))
+
+
+        if (!product) {
+            throw new ResponseError(StatusCodes.NOT_FOUND, `Product not found with id ${id}`)
+        }
+        return product
+    }
+
+    private static async getTrx(externalId: string) {
         const transactions =
             await db.select()
                 .from(transactionsTable)
@@ -33,18 +46,24 @@ export default class PaymentService {
 
         const [transaction] = transactions
         if (!transaction) {
-            throw new ResponseError(404, `Transaction not found with externalId ${externalId}`)
+            throw new ResponseError(404,
+                `Transaction not found with externalId ${externalId}`)
         }
         return transaction
     }
 
-    static async createTransaction(payload: InsertTransaction) {
+    static async createTrx(payload: InsertTransaction) {
         // validation
-        const transactionValidation = Validation.validate(TransactionsValidation.ADD, payload)
+        const transactionValidation =
+            Validation.validate(TransactionsValidation.ADD, payload)
         // check is there product with id = validation.productId
-        const product = await ProductService.get(transactionValidation.productId)
+        const product =
+            await ProductService.get(transactionValidation.productId)
         // create transaction record
-        const [transaction] = await db.insert(transactionsTable).values(transactionValidation).$returningId()
+        const [transaction] = await db
+            .insert(transactionsTable)
+            .values(transactionValidation)
+            .$returningId()
 
         return {
             transaction: { id: transaction.id, ...transactionValidation },
@@ -52,16 +71,20 @@ export default class PaymentService {
         }
     }
 
-    static async updateTransaction(payload: Pick<InsertTransaction, "externalId" | "invoiceId" | "invoiceUrl"> & { id: number }) {
-        await db.update(transactionsTable)
-            .set(payload as unknown as InsertTransaction)
+    static async updateTrx(payload: Partial<InsertTransaction> & { id: number }) {
+        await db
+            .update(transactionsTable)
+            .set(payload)
             .where(eq(transactionsTable.id, payload.id))
     }
 
-    static async updateStatusTransaction(payload: { externalId: string; status: typeof STATUS[number] }) {
+    static async updateStatusTransaction(payload:
+        { externalId: string; status: typeof STATUS[number] }
+    ) {
         const data = { status: payload.status } as unknown as InsertTransaction
 
-        await PaymentService.getTransactionByExternalId(payload.externalId)
+        // first check, is there trx with externalId = payload.externalId
+        await PaymentService.getTrx(payload.externalId)
 
         await db.update(transactionsTable)
             .set(data)
@@ -71,7 +94,7 @@ export default class PaymentService {
     static async createInvoice(request: Request) {
         const body = request.body
 
-        const res = await PaymentService.createTransaction(body)
+        const res = await PaymentService.createTrx(body)
         const transaction = res.transaction;
         const product = res.product
 
@@ -92,7 +115,7 @@ export default class PaymentService {
                     name: product.title ?? "",
                     price: product.originalPrice,
                     quantity: 1,
-                    category: "Ebook"
+                    category: "Ebook",
                 }
             ],
             customerNotificationPreference: {
@@ -108,7 +131,7 @@ export default class PaymentService {
         const invoice = await this.invoiceClient.createInvoice({ data: invoiceData })
 
         // update transaction with invoice id & url
-        await PaymentService.updateTransaction({
+        await PaymentService.updateTrx({
             id: transaction.id,
             externalId: invoice.externalId,
             invoiceId: invoice.id,
@@ -118,23 +141,27 @@ export default class PaymentService {
         return { invoiceUrl: invoice.invoiceUrl }
     }
 
-    static async emailSender() {
-        const template =
-            await ejs.renderFile(__dirname + "/../.." + "/views/email.ejs", {name: "Jokowi", productName: "Chinesewithmeggie jokowi"})
-
+    static async emailSender(payload:
+        { buyer: string; product: string, email: string, image: string, link: string }) {
         try {
+            const file = path.join(__dirname, "..", "..", "views", "email.ejs")
+            const html =
+                await ejs.renderFile(file, {
+                    name: payload.buyer, product: payload.product, image: payload.image, link: payload.link
+                })
+
             const info = await EMAIL_SERVER.sendMail({
-                from: "Hendri alqori <teamhendri18@gmail.com>",
-                to: "teamhendri18@gmail.com",
-                subject: "Informasi pembelian e-book di chinesewithmeggie", // Subject line
-                html: template
+                from: EMAIL_SENDER_FROM,
+                to: payload.email,
+                subject: EMAIL_SENDER_SUBJECT,
+                html
             })
 
             return info.messageId
 
         } catch (error) {
             const errorMessage = (error as Error).message
-            throw new EmailSenderError(502, errorMessage)
+            throw new EmailSenderError(StatusCodes.BAD_GATEWAY, errorMessage)
         }
     }
 
@@ -146,7 +173,18 @@ export default class PaymentService {
         try {
             invoice = await this.invoiceClient.getInvoiceById({ invoiceId: id })
         } catch (error) {
-            throw new PaymentError(404, `Invoice not found with id ${id}`)
+            throw new PaymentError(StatusCodes.NOT_FOUND, `Invoice not found with id ${id}`)
+        }
+
+        const [item] = invoice.items
+        const product = await PaymentService.getProduct(Number(item.referenceId))
+        const transaction = await PaymentService.getTrx(invoice.externalId)
+        const emailPayload = {
+            buyer: transaction.name,
+            email: `${SERVER_ORIGIN}/static/${transaction.email}`,
+            product: product.title,
+            image: product.image,
+            link: product.link
         }
 
         //x-callback-token
@@ -155,12 +193,12 @@ export default class PaymentService {
 
         // token header required
         if (!X_CALLBACK_TOKEN_CLIENT) {
-            throw new PaymentError(400, "Token needed")
+            throw new PaymentError(StatusCodes.UNAUTHORIZED, "Token needed")
         }
 
         // verify x-callback-token between client and server
         if (X_CALLBACK_TOKEN_SERVER !== X_CALLBACK_TOKEN_CLIENT) {
-            throw new PaymentError(400, "Token invalid")
+            throw new PaymentError(StatusCodes.BAD_REQUEST, "Token invalid")
         }
 
         type WebhookResponse = { status: InvoiceStatus, message: string }
@@ -168,15 +206,23 @@ export default class PaymentService {
 
         const mappingStatus: IMappingStatus = {
             SETTLED: async () => {
+                // sending email to buyer
+                await PaymentService.emailSender(emailPayload)
+                // update transaction statu
                 await PaymentService.updateStatusTransaction({
                     externalId: invoice.externalId, status: "SETTLED"
                 })
+
                 return { status: "SETTLED", message: "Payment already processed" }
             },
             PAID: async () => {
+                // sending email to buyer
+                await PaymentService.emailSender(emailPayload)
+                // update transaction statu
                 await PaymentService.updateStatusTransaction({
                     externalId: invoice.externalId, status: "SETTLED"
                 })
+
                 return { status: "PAID", message: "Payment success" }
             },
             PENDING: () => ({ status: "PENDING", message: "Payment on proccess [PENDING]" }),
@@ -184,9 +230,11 @@ export default class PaymentService {
                 await PaymentService.updateStatusTransaction({
                     externalId: invoice.externalId, status: "FAILED"
                 })
-                return { status: "EXPIRED", message: "payment has expired" }
+                throw new PaymentError(StatusCodes.PAYMENT_REQUIRED, "Payment has expired")
             },
-            UNKNOWN_ENUM_VALUE: () => ({ status: "UNKNOWN_ENUM_VALUE", message: "unknown status value" })
+            UNKNOWN_ENUM_VALUE: () => {
+                throw new PaymentError(StatusCodes.NOT_FOUND, "Unknown status value")
+            }
         }
 
         return mappingStatus[invoice.status]()

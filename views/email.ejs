@@ -6,152 +6,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinesemeggie buying product comfirmation</title>
 </head>
-<style>
-    :root {
-        --primary-blue: #6E9FB8;
-    }
-
-    * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-        font-size: 14px;
-        line-height: 130%;
-    }
-
-    html,
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .container {
-        max-width: 600px;
-        width: calc(100% - 20px);
-        margin: auto;
-    }
-
-    .container> :is(.header, .body, .footer) {
-        margin-block: 1rem;
-    }
-
-    .header {
-        padding-block: 1rem;
-        background-color: var(--primary-blue);
-    }
-
-    .header h4,
-    .footer p {
-        color: white;
-        text-align: center;
-    }
-
-    .body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .body .image_wrapper {
-        max-width: 420px;
-        height: 200px;
-        margin: auto;
-    }
-
-    .image_wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-
-    .content>p {
-        padding-block: 0.7rem;
-    }
-
-    .container .cta_wrapper {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        padding-block: 1rem;
-    }
-
-    .cta_wrapper span {
-        font-size: 12.5px;
-        color: gray;
-    }
-
-    .cta_wrapper .link_download {
-        text-align: center;
-        text-decoration: underline;
-    }
-
-    .content a {
-        text-decoration: none;
-        background-color: var(--primary-blue);
-        color: white;
-        padding: 0.7rem 1rem 0.7rem 1rem;
-        border-radius: .2rem;
-        transform: background;
-        transition-duration: .3s;
-    }
-
-    .container a:hover {
-        background-color: var(--primary-blue);
-        opacity: .7;
-    }
-
-    .footer {
-        padding-block: 1.6rem;
-        background-color: #000000;
-    }
-
-    @media (width <=420px) {
-        * {
-            font-size: 12px;
-        }
-    }
-</style>
-
-<body>
-    <main class="container">
-        <header class="header">
-            <h4>Informasi pembelian produk</h4>
-        </header>
-        <section class="body">
-            <div class="image_wrapper">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdVm_ywe9-CkGyyxRXfc8mOM40qA7MX2Wd1Q&s"
-                    alt="product-image" />
+<body
+    style="font-family: Arial, Helvetica, sans-serif; padding: 0; margin: 0; box-sizing: border-box; font-size: 14px;">
+    <main style="width: 100%; max-width: 600px; margin: auto; border: 1px solid rgb(240, 240, 240);
+        box-shadow: rgba(67, 67, 67, 0.09) 0px 20px 30px;
+        ">
+        <section
+            style="gap: 1rem; padding-inline: 1rem;">
+            <div style="max-width: 420px; height: 200px; padding-top: 1rem;">
+                <img src="<%= image %>"
+                    alt="product-image" style="width: 100%; height: 100%; object-fit: contain;" />
             </div>
             <div class="content">
-                <p>Halo <%= name %></p>
-                <p>Terima kasih banyak atas pembelian eBook <span style="font-weight: 600;"><%= productName %></span>. Kami sangat menghargai
+                <p style="padding-block: 0.5rem;">Halo <%= name %>
+                </p>
+                <p style="padding-block: 0.5rem;">Terima kasih banyak atas pembelian eBook <span
+                        style="font-weight: 600;">
+                        <%= product %>
+                    </span>. Kami sangat menghargai
                     kepercayaan Anda dalam memilih eBook ini sebagai bagian dari perjalanan belajar Anda.</p>
-                <p>Kami berharap eBook ini dapat membantu Anda mencapai tujuan belajar bahasa Mandarin dengan lebih
+                <p style="padding-block: 0.5rem;">Kami berharap eBook ini dapat membantu Anda mencapai tujuan belajar
+                    bahasa Mandarin dengan lebih
                     efektif
                     dan menyenangkan. Jika ada pertanyaan atau saran terkait eBook ini, jangan ragu untuk menghubungi
                     kami.
                     Kami selalu siap membantu.</p>
-                <p>Sekali lagi, terima kasih atas dukungannya, dan selamat belajar dengan eBook <span
-                        style="font-weight: 600;"><%= productName %></span></p>
+                <p style="padding-block: 0.5rem;">Sekali lagi, terima kasih atas dukungannya dan selamat belajar dengan
+                    eBook <span style="font-weight: 600;">
+                        <%= product %>
+                    </span></p>
 
-                <p>Salam hangat, <br>
+                <p style="padding-block: 0.5rem;">Salam hangat, <br>
                     <span style="font-weight: 700;">chinesewithmeggie</span>
                 </p>
 
-                <div class="cta_wrapper">
-                    <a href="" target="_blank" referrerpolicy="no-referrer">
-                        Akses konten disini!
-                    </a>
-                    <span>tombol bermasalah ? copy link di bawah</span>
-                    <p class="link_download">
-                        https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdVm_ywe9-CkGyyxRXfc8mOM40qA7MX2Wd1Q&s</p>
+                <div>
+                    <span style="font-size: 12.5px; color: gray;">akses konten dibawah ini</span>
+                    <p style="text-decoration: underline;"><%= link %></p>
                 </div>
             </div>
         </section>
-        <footer class="footer">
+        <footer style="padding-block: 1.6rem !important;">
             <p>Copyright © 2024 | chinesewithmeggie</p>
         </footer>
     </main>

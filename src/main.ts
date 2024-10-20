@@ -11,8 +11,6 @@ import { logger } from "./utils/helpers";
 import { errorResponse } from "./middlewares/error.middleware";
 import { rateLimiter } from "./middlewares/rate-limit.middleware";
 import { FRONTEND_ORIGIN } from "./constant";
-import { EMAIL_SERVER } from "./configs/email-server";
-import hbs from "nodemailer-express-handlebars";
 
 dotenv.config()
 
@@ -47,7 +45,7 @@ app.use(cookieParser())
 app.use(apiRouter)
 
 // ping API
-app.get("/api/ping", (req, res) => {
+app.get("/api/v1/ping", (req, res) => {
     res.status(200).json({ message: "PING!", time: new Date() })
 })
 

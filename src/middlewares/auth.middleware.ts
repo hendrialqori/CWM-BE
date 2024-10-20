@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken"
 import { AuthenticationError } from "../utils/errors";
 import { SECRET_KEY } from "../constant";
+import { StatusCodes } from "http-status-codes";
 
-export async function accessValidation(req: Request, res: Response, next: NextFunction) {
+export async function accessValidation(req: Request, _res: Response, next: NextFunction) {
     try {
         // header
         const authorization = req.headers.authorization
@@ -17,6 +18,6 @@ export async function accessValidation(req: Request, res: Response, next: NextFu
         next()
 
     } catch (error) {
-        next(new AuthenticationError(401, "Unauthorized"))
+        next(new AuthenticationError(StatusCodes.UNAUTHORIZED, "Unauthorized"))
     }
 }

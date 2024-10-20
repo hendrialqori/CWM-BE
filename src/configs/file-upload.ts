@@ -2,17 +2,6 @@ import multer from "multer";
 import { FileUploadError } from "../utils/errors";
 import { MAX_IMAGE_SIZE } from "../constant";
 
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         const path = "./public/static/"
-//         cb(null, path)
-//     },
-//     filename: (req, file, cb) => {
-//         const fileName = Date.now() + "-" + file.originalname
-//         cb(null, fileName)
-//     }
-// })
-
 const storage = multer.memoryStorage()
 
 const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {

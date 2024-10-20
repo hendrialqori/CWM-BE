@@ -1,8 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import { ZodError } from 'zod'
+import multer from "multer";
 import * as Error from "../utils/errors"
 import { winstonLogger } from "../utils/helpers";
-import multer from "multer";
+import { StatusCodes } from "http-status-codes";
 
 export function errorResponse(error: Error, request: Request, response: Response, next: NextFunction) {
 
@@ -69,7 +70,7 @@ export function errorResponse(error: Error, request: Request, response: Response
             message: error.stack
         })
 
-        response.status(500).json({
+        response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             type: "Unknown Error",
             errors: error.message
         });

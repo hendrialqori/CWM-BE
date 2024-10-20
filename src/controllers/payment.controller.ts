@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import PaymentService from "../services/payment.service";
+import { StatusCodes } from "http-status-codes";
 
 export default class PaymentController {
     static async createInvoice(req: Request, res: Response, next: NextFunction) {
@@ -8,7 +9,7 @@ export default class PaymentController {
             const { invoiceUrl } = invoice
 
             return res
-                .status(200)
+                .status(StatusCodes.OK)
                 .json({
                     data: { invoiceUrl },
                     message: "Successfully create invoice"
@@ -23,19 +24,26 @@ export default class PaymentController {
         try {
             const { status, message } = await PaymentService.webhook(req)
             return res
-                .status(201)
-                .json({ data: { status }, message })
-
+                .status(StatusCodes.OK)
+                .send({ data: { status }, message })
 
         } catch (error) {
             next(error)
         }
     }
 
-    static async emailSender(req: Request, res: Response, next: NextFunction) {
+    static async emailSender(_req: Request, res: Response, next: NextFunction) {
         try {
-            const messageId = await PaymentService.emailSender()
-            return res.status(200).json({ messageId })
+            const messageId = await PaymentService.emailSender({
+                buyer: "Prabowo",
+                product: "Chinesewithmeggie",
+                email: "teamhendri18@gmail.com",
+                image: "1728909692374-Icon-3-removebg-preview.png",
+                link: ""
+            })
+            return res
+                .status(StatusCodes.OK)
+                .send({ messageId })
 
         } catch (error) {
             next(error)
