@@ -181,9 +181,9 @@ export default class PaymentService {
         const transaction = await PaymentService.getTrx(invoice.externalId)
         const emailPayload = {
             buyer: transaction.name,
-            email: `${SERVER_ORIGIN}/static/${transaction.email}`,
+            image: `${SERVER_ORIGIN}/static/${product.image}`,
             product: product.title,
-            image: product.image,
+            email: transaction.email,
             link: product.link
         }
 
