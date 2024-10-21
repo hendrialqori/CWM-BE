@@ -87,8 +87,4 @@ export default class AuthService {
     private static async usernameChecker(username: string) {
         return await db.select().from(usersTable).where(eq(usersTable.username, username))
     }
-
-    static async sessionTokenChecker(sessionToken: string) {
-        return await db.select().from(usersTable).where(eq(usersTable.sessionToken, sessionToken))
-    }
 }
