@@ -18,7 +18,7 @@ const PORT = 8000
 
 const app = express()
 
-app.set('trust proxy', 1)
+// app.set('trust proxy', 1)
 
 app.use(cors({
     credentials: true,
