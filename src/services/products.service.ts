@@ -47,11 +47,9 @@ export default class ProductService {
             .from(productsTable)
             .where((eq(productsTable.isOffer, true)))
 
-
-        if (!radash.isObject(offer)) {
+        if (!offer) {
             throw new Error.ResponseError(404, `No one products has isOffer property is true`)
         }
-
         return offer
     }
 
@@ -61,9 +59,9 @@ export default class ProductService {
             .from(productsTable)
             .where(eq(productsTable.id, id))
 
-        const product = products[0]
+        const [product] = products
 
-        if (!radash.isObject(product)) {
+        if (!product) {
             throw new Error.ResponseError(404, `Product not found with id ${id}`)
         }
 
