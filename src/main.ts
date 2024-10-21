@@ -18,11 +18,11 @@ const PORT = 8000
 
 const app = express()
 
-// app.set('trust proxy', 1)
+app.set('trust proxy', 1)
 
 app.use(cors({
     credentials: true,
-    origin: FRONTEND_ORIGIN,
+    origin: "*",
 }))
 
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms"))
