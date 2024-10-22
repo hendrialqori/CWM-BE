@@ -36,9 +36,8 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(helmet());
 
-//serve static file
-// app.use(express.static("public"))
-app.use(express.static(path.join(__dirname, "..", 'public')));
+//serve static file for image
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 // cookie middleware
 app.use(cookieParser())
