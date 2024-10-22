@@ -14,7 +14,6 @@ export class ProductsValidation {
             .refine((price) => !onlyDigits.test(price), "Invalid input, Please enter a valid number")
             .transform((price) => Number(price)),
         isOffer: z.enum(["1", "0"]).transform((isOffer) => Boolean(Number(isOffer.toString()))), // 1 = true, 0 = false
-        link: z.string().min(1, { message: "Required" }),
         description: z.string().min(1)
     })
 
