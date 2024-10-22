@@ -1,1 +1,0 @@
-ALTER TABLE `products` ADD `isOffer` boolean DEFAULT false;
