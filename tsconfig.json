@@ -11,11 +11,11 @@
       "outDir": "./dist",
       "rootDir": "./src",
       "baseUrl": ".",
-      "paths": {
-        "@/*": [
-          "src/*"
-        ]
-      },
+      // "paths": {
+      //   "@/*": [
+      //     "src/*"
+      //   ]
+      // },
       "incremental": true,
       "skipLibCheck": true,
       "strictNullChecks": false,
