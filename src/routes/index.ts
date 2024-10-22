@@ -1,6 +1,5 @@
 import express from 'express';
 import AuthController from '../controllers/auth.controller';
-import UsersController from '../controllers/users.controller';
 import ProductsController from '../controllers/products.controller';
 import PaymentController from '../controllers/payment.controller';
 import TransactionsController from '../controllers/transaction.controller';
@@ -9,6 +8,11 @@ import { fileUpload } from '../configs/file-upload';
 
 const apiRouter = express.Router()
 const ROUTE = "/api/v1"
+
+const uploadHandlers = fileUpload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "zip", maxCount: 1 }
+])
 
 // auth
 apiRouter.post(`${ROUTE}/auth/register`, AuthController.register)
@@ -20,8 +24,8 @@ apiRouter.get(`${ROUTE}/product/offer/public`, ProductsController.getOffer)
 
 apiRouter.get(`${ROUTE}/product/list`, accessValidation, ProductsController.listPrivate)
 apiRouter.get(`${ROUTE}/product/:id`, accessValidation, ProductsController.get)
-apiRouter.post(`${ROUTE}/product/add`, [accessValidation, fileUpload.single("image")], ProductsController.add)
-apiRouter.put(`${ROUTE}/product/:id/update`, [accessValidation, fileUpload.single("image")], ProductsController.update)
+apiRouter.post(`${ROUTE}/product/add`, [accessValidation, uploadHandlers], ProductsController.add)
+apiRouter.put(`${ROUTE}/product/:id/update`, [accessValidation, uploadHandlers], ProductsController.update)
 apiRouter.delete(`${ROUTE}/product/:id/remove`, accessValidation, ProductsController.remove)
 
 //transactions
