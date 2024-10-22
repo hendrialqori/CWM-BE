@@ -16,20 +16,21 @@ export const users = mysqlTable(USERS, {
 
 export const products = mysqlTable(PRODDUCTS, {
     id: int("id").primaryKey().autoincrement(),
-    title: varchar("title", { length: 100 }),
-    image: text("image"),
+    title: varchar("title", { length: 100 }).notNull(),
+    image: text("image").notNull(),
     originalPrice: int("originalPrice").notNull(),
     strikeoutPrice: int("strikeoutPrice").notNull(),
-    link: text("link"),
-    description: text("description"),
     isOffer: boolean("isOffer").default(false),
+    zipPath: text("zipPath").notNull(),
+    zipMd5: text("zipMd5").notNull(),
+    description: text("description"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow()
 })
 
-export const productsRelations = relations(products, ({ many }) => ({
-    transactions: many(products)
-}))
+// export const productsRelations = relations(products, ({ many }) => ({
+//     transactions: many(transactions),
+// }))
 
 export const transactions = mysqlTable(TRANSACTIONS, {
     id: int("id").primaryKey().autoincrement(),

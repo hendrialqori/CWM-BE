@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "e78162ee-29aa-44ee-afee-40dd4c6a11cb",
-  "prevId": "b6fe4a58-bd01-4f48-9a1c-7527813a3337",
+  "id": "2c6ce5a1-aaa3-4da7-9d2e-a83961b749b5",
+  "prevId": "80ce3cba-8cf9-4c7d-94a2-21d8b66ce5fe",
   "tables": {
     "products": {
       "name": "products",
@@ -13,6 +13,20 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         },
         "originalPrice": {
           "name": "originalPrice",
@@ -28,15 +42,45 @@
           "notNull": true,
           "autoincrement": false
         },
+        "isOffer": {
+          "name": "isOffer",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "zipPath": {
+          "name": "zipPath",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "zipMd5": {
+          "name": "zipMd5",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "description": {
           "name": "description",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "createdAt": {
           "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
@@ -66,6 +110,13 @@
           "notNull": true,
           "autoincrement": true
         },
+        "name": {
+          "name": "name",
+          "type": "varchar(225)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "email": {
           "name": "email",
           "type": "varchar(100)",
@@ -75,7 +126,7 @@
         },
         "phone": {
           "name": "phone",
-          "type": "int",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -87,8 +138,45 @@
           "notNull": true,
           "autoincrement": false
         },
+        "externalId": {
+          "name": "externalId",
+          "type": "varchar(225)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "invoiceId": {
+          "name": "invoiceId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "invoiceUrl": {
+          "name": "invoiceUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('PENDING','SETTLED','FAILED')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'PENDING'"
+        },
         "createdAt": {
           "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
@@ -153,20 +241,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "salt": {
-          "name": "salt",
-          "type": "varchar(225)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sessionToken": {
-          "name": "sessionToken",
-          "type": "varchar(225)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp",
@@ -192,9 +266,7 @@
   "_meta": {
     "schemas": {},
     "tables": {},
-    "columns": {
-      "\"transactions\".\"created_at\"": "\"transactions\".\"createdAt\""
-    }
+    "columns": {}
   },
   "internal": {
     "tables": {},
