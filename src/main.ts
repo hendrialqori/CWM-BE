@@ -11,6 +11,7 @@ import { logger } from "./utils/helpers";
 import { errorResponse } from "./middlewares/error.middleware";
 import { rateLimiter } from "./middlewares/rate-limit.middleware";
 import { FRONTEND_ORIGIN } from "./constant";
+import path from "path";
 
 dotenv.config()
 
@@ -36,7 +37,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
 
 //serve static file
-app.use(express.static("public"))
+// app.use(express.static("public"))
+app.use(express.static(path.join(__dirname, "..", 'public')));
 
 // cookie middleware
 app.use(cookieParser())
