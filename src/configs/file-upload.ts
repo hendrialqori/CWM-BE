@@ -4,8 +4,8 @@ import { MAX_IMAGE_SIZE } from "../constant";
 
 const storage = multer.memoryStorage()
 
-const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    const allowsMimeType = ["image/png", "image/jpg", "image/jpeg"]
+const fileFilter = (_req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const allowsMimeType = ["image/png", "image/jpg", "image/jpeg", "application/zip", "application/x-zip-compressed"]
     if (allowsMimeType.includes(file.mimetype)) {
         cb(null, true)
     } else {
@@ -14,14 +14,17 @@ const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.
     }
 }
 
-const fileLimits: multer.Options = {
-    limits: {
-        fileSize: MAX_IMAGE_SIZE,
-    }
-}
+// const imageValdation: multer.Options = {
+//     limits: {
+//         fileSize: MAX_IMAGE_SIZE,
+//     }
+// }
 
 export const fileUpload = multer({
     storage,
     fileFilter,
-    limits: fileLimits.limits
+    // limits: imageValdation.limits
 })
+
+
+
