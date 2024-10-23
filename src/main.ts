@@ -23,7 +23,8 @@ app.set('trust proxy', 1)
 
 app.use(cors({
     credentials: true,
-    origin: ["https://mail.google.com", FRONTEND_ORIGIN],
+    origin: FRONTEND_ORIGIN,
+    exposedHeaders: "X-Filename"
 }))
 
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms"))
