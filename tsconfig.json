@@ -10,7 +10,7 @@
       "sourceMap": false,
       "outDir": "./dist",
       "rootDir": "./src",
-      "baseUrl": ".",
+      // "baseUrl": ".",
       // "paths": {
       //   "@/*": [
       //     "src/*"
