@@ -49,4 +49,12 @@ export default class PaymentController {
             next(error)
         }
     }
+
+    static async downloadZip(req: Request, res: Response, next: NextFunction) {
+        try {
+            await PaymentService.downloadZip(req, res)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
