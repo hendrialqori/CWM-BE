@@ -12,7 +12,7 @@ import { InsertProduct, Product } from '../types'
 import radash from 'radash'
 import { writeFile, unlink } from 'fs/promises'
 import path from 'path'
-import { generateMD5 } from 'src/utils/helpers'
+import { generateMD5 } from '../utils/helpers'
 
 export default class ProductService {
 
@@ -155,7 +155,7 @@ export default class ProductService {
         // if user upload new zip file
         if (isZip) {
             const zipName = `${Date.now()}-${zipFile.originalname}`
-            const zipBuffer = imageFile.buffer
+            const zipBuffer = zipFile.buffer
             const zipPath = path.join(__dirname, "..", "..", "_zip", zipName);
             // insert new zip
             await writeFile(zipPath, zipBuffer)
