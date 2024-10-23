@@ -5,6 +5,7 @@ import PaymentController from '../controllers/payment.controller';
 import TransactionsController from '../controllers/transaction.controller';
 import { accessValidation } from '../middlewares/auth.middleware';
 import { fileUpload } from '../configs/file-upload';
+import { encrypt, decrypt } from '../utils/cipher';
 
 const apiRouter = express.Router()
 const ROUTE = "/api/v1"
@@ -36,6 +37,7 @@ apiRouter.get(`${ROUTE}/transaction/:id`, accessValidation, TransactionsControll
 apiRouter.post(`${ROUTE}/payment/invoice/create`, PaymentController.createInvoice)
 apiRouter.post(`${ROUTE}/payment/webhook`, PaymentController.webhook)
 apiRouter.get(`${ROUTE}/payment/email/sender`, PaymentController.emailSender)
+apiRouter.get(`${ROUTE}/download/:encrypted`, PaymentController.downloadZip)
 
 export default apiRouter
 
