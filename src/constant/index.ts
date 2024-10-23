@@ -4,6 +4,9 @@ export const DATABASE_URL = process.env.DATABASE_URL
 export const SERVER_ORIGIN = process.env.SERVER_ORIGIN
 export const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN
 
+export const CIPHER_ALGORITHM = process.env.CIPHER_ALGORITHM
+export const CIPHER_PASSWORD = process.env.CIPHER_PASSWORD
+
 export const SUCCESS_PAYMENT_URL = process.env.SUCCESS_PAYMENT_URL
 export const FAILED_PAYMENT_URL = process.env.FAILED_PAYMENT_URL
 export const XENDIT_SECRET_KEY = process.env.XENDIT_SECRET_KEY
