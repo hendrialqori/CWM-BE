@@ -21,7 +21,8 @@ const app = express()
 
 app.use(cors({
     credentials: true,
-    origin: FRONTEND_ORIGIN
+    origin: FRONTEND_ORIGIN,
+    exposedHeaders: "X-Filename"
 }))
 
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms"))
