@@ -1,5 +1,6 @@
+import fs from "node:fs"
 import type { CreateInvoiceRequest, Invoice, InvoiceStatus } from "xendit-node/invoice/models";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { eq } from "drizzle-orm";
 import ejs from "ejs"
 
@@ -15,11 +16,12 @@ import { products as productsTable } from "../model/schema";
 import { EmailSenderError, PaymentError, ResponseError } from "../utils/errors";
 import {
     FAILED_PAYMENT_URL, STATUS, SUCCESS_PAYMENT_URL, XENDIT_CALLBACK_TOKEN,
-    EMAIL_SENDER_FROM, EMAIL_SENDER_SUBJECT, SERVER_ORIGIN
+    EMAIL_SENDER_FROM, EMAIL_SENDER_SUBJECT, SERVER_ORIGIN, FRONTEND_ORIGIN
 } from "../constant";
 import { EMAIL_SERVER } from "../configs/email-server";
 import { StatusCodes } from "http-status-codes";
 import path from "path";
+import * as cipher from "../utils/cipher";
 
 
 export default class PaymentService {
@@ -78,7 +80,7 @@ export default class PaymentService {
             .where(eq(transactionsTable.id, payload.id))
     }
 
-    static async updateStatusTransaction(payload:
+    static async updateTrxPaymentStatus(payload:
         { externalId: string; status: typeof STATUS[number] }
     ) {
         const data = { status: payload.status } as unknown as InsertTransaction
@@ -179,12 +181,18 @@ export default class PaymentService {
         const [item] = invoice.items
         const product = await PaymentService.getProduct(Number(item.referenceId))
         const transaction = await PaymentService.getTrx(invoice.externalId)
+
+        const trxPayload = JSON.stringify({
+            productId: product.id,
+        })
+        const encrypted = cipher.encrypt(trxPayload)
+
         const emailPayload = {
             buyer: transaction.name,
             image: `${SERVER_ORIGIN}/static/${product.image}`,
             product: product.title,
             email: transaction.email,
-            link: product.link
+            link: `${FRONTEND_ORIGIN}/claim/${encrypted}`
         }
 
         //x-callback-token
@@ -209,7 +217,7 @@ export default class PaymentService {
                 // sending email to buyer
                 await PaymentService.emailSender(emailPayload)
                 // update transaction statu
-                await PaymentService.updateStatusTransaction({
+                await PaymentService.updateTrxPaymentStatus({
                     externalId: invoice.externalId, status: "SETTLED"
                 })
 
@@ -219,7 +227,7 @@ export default class PaymentService {
                 // sending email to buyer
                 await PaymentService.emailSender(emailPayload)
                 // update transaction statu
-                await PaymentService.updateStatusTransaction({
+                await PaymentService.updateTrxPaymentStatus({
                     externalId: invoice.externalId, status: "SETTLED"
                 })
 
@@ -227,7 +235,7 @@ export default class PaymentService {
             },
             PENDING: () => ({ status: "PENDING", message: "Payment on proccess [PENDING]" }),
             EXPIRED: async () => {
-                await PaymentService.updateStatusTransaction({
+                await PaymentService.updateTrxPaymentStatus({
                     externalId: invoice.externalId, status: "FAILED"
                 })
                 throw new PaymentError(StatusCodes.PAYMENT_REQUIRED, "Payment has expired")
@@ -240,4 +248,23 @@ export default class PaymentService {
         return mappingStatus[invoice.status]()
     }
 
+    static async downloadZip(req: Request, res: Response) {
+        const { encrypted } = req.params
+        const { productId } = cipher.decrypt<{ productId: number }>(encrypted)
+
+        const product = await PaymentService.getProduct(productId)
+
+        const zipPathProduct = path.join(__dirname, "..", "..", "_zip", product.zipPath)
+        if (!zipPathProduct) {
+            throw new ResponseError(StatusCodes.NOT_FOUND, "File not found")
+        }
+
+        // Set the response headers to indicate a file download
+        res.setHeader("Content-Disposition", `attachment; filename=${product.zipPath}`)
+        res.setHeader("Content-Type", "application/zip")
+        res.setHeader("X-Filename", product.zipPath)
+
+        const fileStream = fs.createReadStream(zipPathProduct);
+        fileStream.pipe(res);
+    }
 }
