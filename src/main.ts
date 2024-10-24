@@ -7,7 +7,6 @@ import helmet from "helmet"
 import morgan from "morgan"
 
 import apiRouter from "./routes";
-import { logger } from "./utils/helpers";
 import { errorResponse } from "./middlewares/error.middleware";
 import { rateLimiter } from "./middlewares/rate-limit.middleware";
 import { FRONTEND_ORIGIN } from "./constant";
@@ -55,9 +54,6 @@ app.get("/api/v1/ping", (req, res) => {
 
 // error response middleware
 app.use(errorResponse)
-
-// logger request
-app.use(logger)
 
 app.listen(PORT, () => {
     // winstonLogger.info
